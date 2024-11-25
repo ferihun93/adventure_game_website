@@ -7,7 +7,7 @@ import "./input.css";
 import "./output.css";
 
 function App() {
-  const [character, setCharacter] = useState();
+  // const [character, setCharacter] = useState();
 
   const [showFirstSection, setShowFirstSection] = useState(true);
 
@@ -15,11 +15,11 @@ function App() {
     setShowFirstSection(false); // Állapotot csak egy irányban változtatjuk
   };
 
-  function handleSelect(selectedCharacter: string) {
-    // selectedButton => 'components, 'jsx', 'props', 'state
-    setCharacter(character);
-    //console.log(selectedTopic);
-  }
+  // function handleSelect(selectedCharacter: string) {
+  //   // selectedButton => 'components, 'jsx', 'props', 'state
+  //   setCharacter(character);
+  //   //console.log(selectedTopic);
+  // }
 
   return (
     <main>
@@ -28,9 +28,9 @@ function App() {
       ) : (
         <div>
           <h2 className="text-3xl mb-6">
-            Choose your character to start your adventure
+            Choose your character to start your adventure:
           </h2>
-          <div className="w-[80rem] border-solid border-green-600 border-2 flex flex-row justify-evenly gap-4">
+          <div className="w-[80rem] disabled:border flex flex-row justify-evenly gap-4">
             {CHARACTERS_DETAILS.map((characterItem) => (
               <CharacterSelection
                 key={characterItem.characterName}
