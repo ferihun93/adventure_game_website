@@ -1,67 +1,88 @@
 import { useState } from "react";
-import CharacterSelection from "./components/CharacterSelection.tsx";
-import { CHARACTERS_DETAILS } from "./data.js";
-import { WelcomePage } from "./components/WelcomePage.tsx";
+import CharacterSelection from "./components/CharacterSelection";
+import { CHARACTERS_DETAILS } from "./data"; // Az adatokat importáljuk
+import { WelcomePage } from "./components/WelcomePage";
+import CharacterStatus from "./components/CharacterStatus";
 import "./App.css";
 import "./input.css";
 import "./output.css";
 
 function App() {
-  // const [character, setCharacter] = useState();
-
+  // Kezdeti állapotok
   const [showFirstSection, setShowFirstSection] = useState(true);
+  const [selectedCharacter, setSelectedCharacter] = useState<null | string>(
+    null
+  );
+  const [storyIndex, setStoryIndex] = useState<number>(0); // A történet szakaszának indexe
 
-  const toggleSection = () => {
-    setShowFirstSection(false); // Állapotot csak egy irányban változtatjuk
+  // Kezelő, ami beállítja a kiválasztott karaktert
+  const handleCharacterSelection = (characterName: string) => {
+    setSelectedCharacter(characterName);
+    setShowFirstSection(false); // A karakter választása után átugrik a történetre
+    setStoryIndex(0); // A történet kezdetét állítja be
   };
 
-  // function handleSelect(selectedCharacter: string) {
-  //   // selectedButton => 'components, 'jsx', 'props', 'state
-  //   setCharacter(character);
-  //   //console.log(selectedTopic);
-  // }
+  // Kiválasztott karakter adatainak lekérése
+  const selectedCharacterData = CHARACTERS_DETAILS.find(
+    (character) => character.characterName === selectedCharacter
+  );
+
+  // Történet folytatása, választható lehetőségek kezelése
+  const handleOptionSelect = (nextPage: number | null) => {
+    if (nextPage === null) {
+      // Ha nincs több oldal, visszaállítjuk az alapértelmezett állapotokat
+      setSelectedCharacter(null);
+      setShowFirstSection(true);
+    } else {
+      // Frissítjük az indexet a következő oldalra
+      setStoryIndex(nextPage);
+    }
+  };
 
   return (
-    <main>
+    <main className="flex items-center justify-center h-screen">
       {showFirstSection ? (
-        <WelcomePage handleClick={toggleSection} />
+        <WelcomePage handleClick={() => setShowFirstSection(false)} />
       ) : (
         <div>
-          <h2 className="text-3xl mb-6">
-            Choose your character to start your adventure:
-          </h2>
-          <div className="w-[80rem] disabled:border flex flex-row justify-evenly gap-4">
-            {CHARACTERS_DETAILS.map((characterItem) => (
-              <CharacterSelection
-                key={characterItem.characterName}
-                {...characterItem}
-              />
-            ))}
-          </div>
+          {/* Karakterválasztás vagy történet, ha már választottak karaktert */}
+          {!selectedCharacter ? (
+            <CharacterSelection
+              characters={CHARACTERS_DETAILS}
+              onCharacterSelect={handleCharacterSelection}
+            />
+          ) : (
+            <div className="grid grid-cols-3 grid-rows-3 w-screen">
+              <div className="row-start-1 col-start-1">
+                <CharacterStatus />
+              </div>
+              {/* Kiválasztott karakter neve és története */}
+              <h2 className="text-2xl">You chose: {selectedCharacter}</h2>
+              <p className="row-start-2 col-start-1 col-span-3 text-xl">
+                {selectedCharacterData?.story[storyIndex].text}
+              </p>
+              {/* Történet folytatása, választható lehetőségek */}
+              <div className="mt-6 col-start-1 row-start-3 col-span-3 flex flex-col items-center justify-center">
+                <p className="mb-4">Choose your next action:</p>
+                {selectedCharacterData?.story[storyIndex].options.map(
+                  (option, index) => (
+                    <button
+                      key={index}
+                      onClick={() =>
+                        handleOptionSelect(option.nextPage || null)
+                      }
+                      className={`mt-4 ${selectedCharacterData.cardColor} hover:${selectedCharacterData.hoverColor} m-2 text-white py-2 px-4 rounded`}
+                    >
+                      {option.text}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </main>
-    //   <div>
-    //     <a href="https://vite.dev" target="_blank">
-    //       <img src={viteLogo} className="logo" alt="Vite logo" />
-    //     </a>
-    //     <a href="https://react.dev" target="_blank">
-    //       <img src={reactLogo} className="logo react" alt="React logo" />
-    //     </a>
-    //   </div>
-    //   <h1 className="text-blue-600">Vite + React</h1>
-    //   <div className="card">
-    //     <button onClick={() => setCount((count) => count + 1)}>
-    //       count is {count}
-    //     </button>
-    //     <p>
-    //       Edit <code>src/App.tsx</code> and save to test HMR
-    //     </p>
-    //   </div>
-    //   <p className="read-the-docs">
-    //     Click on the Vite and React logos to learn more
-    //   </p>
-    // </>
   );
 }
 
